@@ -1,30 +1,39 @@
 from random import random
-from activation_functions import ReLU
 
 class Network:
-    def __init__(self, size:list):
+    def __init__(self, size:list, activation_functions:list):
         self.layers = []
         for i in range(1, len(size)):
-            self.layers.append(Layer(size[i], size[i - 1]))
+            self.layers.append(Layer(size[i], size[i - 1], activation_functions[i - 1]))
 
     def __repr__(self):
         return f"Network {self.layers}"
 
 class Layer:
-    def __init__(self, size:int, previous_layer_size:int):
+    def __init__(self, size:int, previous_layer_size:int, activation_function:callable):
         self.neurons = []
         for _ in range(size):
-            self.neurons.append(Neuron(previous_layer_size))
-    
+            self.neurons.append(Neuron(previous_layer_size, activation_function))
+
     def __repr__(self):
         return f"Layer: {self.neurons}"
 
 class Neuron:
-    def __init__(self, previous_layer_neurons):
+    def __init__(self, previous_layer_neurons, activation_function:callable):
+        self.activation_function = activation_function
         self.weights = []
         for _ in range(previous_layer_neurons):
             self.weights.append(random() / 10)
         self.bias = random() / 10
+        self.previous_activation = None
+
+    def activation(self, previous_layer_output:list):
+        weighted = 0
+        for weight, output in zip(self.weights, previous_layer_output):
+            weighted += weight * output
+        weighted += self.bias
+        self.previous_activation = self.activation_function(weighted)
+        return self.previous_activation
 
     def __repr__(self):
         return f"Neuron {[round(weight, 3) for weight in self.weights] + [round(self.bias, 3)]}"
