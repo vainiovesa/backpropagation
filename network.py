@@ -38,14 +38,15 @@ class Neuron:
         for _ in range(previous_layer_neurons):
             self.weights.append(random() / 10)
         self.bias = random() / 10
+        self.previous_weighted = None
         self.previous_activation = None
 
     def activation(self, previous_layer_output:list):
-        weighted = 0
+        self.previous_weighted = 0
         for weight, output in zip(self.weights, previous_layer_output):
-            weighted += weight * output
-        weighted += self.bias
-        self.previous_activation = self.activation_function(weighted)
+            self.previous_weighted += weight * output
+        self.previous_weighted += self.bias
+        self.previous_activation = self.activation_function(self.previous_weighted)
         return self.previous_activation
 
     def __repr__(self):
