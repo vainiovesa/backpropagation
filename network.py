@@ -44,7 +44,7 @@ class Neuron:
         for _ in range(previous_layer_neurons):
             self.weights.append(random() / 10)
         self.bias = random() / 10
-        self.derivative_over_cost = None
+        self.derivative_of_cost = None
         self.previous_weighted = None
         self.previous_activation = None
 
@@ -55,6 +55,42 @@ class Neuron:
         self.previous_weighted += self.bias
         self.previous_activation = self.activation_function(self.previous_weighted)
         return self.previous_activation
+
+    def previous_layer_derivatives(self, expected:float):
+        derivatives = []
+        part = self.activation_function_derivative(self.previous_weighted)
+        part *= 2 * (self.previous_activation - expected)
+        for weight in self.weights:
+            derivatives.append(weight * part)
+        return derivatives
+
+    def weights_derivatives(self, previous_layer_activations:list, expected:float):
+        derivatives = []
+        part = self.activation_function_derivative(self.previous_weighted)
+        part *= 2 * (self.previous_activation - expected)
+        for activation in previous_layer_activations:
+            derivatives.append(activation * part)
+        return derivatives
+
+    def bias_derivative(self, expected:float):
+        part = self.activation_function_derivative(self.previous_weighted)
+        part *= 2 * (self.previous_activation - expected)
+        return part
+
+    def update_derivative_of_cost(self, new:float):
+        self.derivative_of_cost = new
+
+    def update_weights_and_bias(self, delta_weights:list, delta_bias:float):
+        updated_weights = []
+        for old, new in zip(self.weights, delta_weights):
+            updated_weights.append(old + new)
+        self.weights = updated_weights
+        self.bias += delta_bias
+
+    def reset_all(self):
+        self.previous_activation = None
+        self.derivative_of_cost = None
+        self.previous_weighted = None
 
     def __repr__(self):
         weights = [round(weight, 3) for weight in self.weights]
