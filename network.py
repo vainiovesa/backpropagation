@@ -118,8 +118,8 @@ class Neuron:
         self.activation_function_derivative = activation_function_derivative
         self.weights = []
         for _ in range(previous_layer_neurons):
-            self.weights.append(random() / 10 - 0.5)
-        self.bias = random() / 10 - 0.5
+            self.weights.append(random() - 0.5)
+        self.bias = random() - 0.5
         self.derivative_of_cost = None
         self.previous_weighted = None
         self.previous_activation = None
