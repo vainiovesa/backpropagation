@@ -14,29 +14,29 @@ class Network:
             last = layer.activations(last)
         return last
 
-    def reverse(self, inputs:list, expected_outputs:list):
+    def reverse(self, inputs:list, expected_outputs:list, learning_rate:float):
         if len(self.layers) == 1:
-            self.one_layer_reverse(inputs, expected_outputs)
+            self.one_layer_reverse(inputs, expected_outputs, learning_rate)
         else:
-            self.outputlayer_reverse(expected_outputs)
-            self.hidden_layers_reverse()
-            self.first_layer_reverse(inputs)
+            self.outputlayer_reverse(expected_outputs, learning_rate)
+            self.hidden_layers_reverse(learning_rate)
+            self.first_layer_reverse(inputs, learning_rate)
 
-    def one_layer_reverse(self, inputs:list, expected_outputs:list):
+    def one_layer_reverse(self, inputs:list, expected_outputs:list, learning_rate:float):
         layer = self.layers[0]
-        layer.update_weights_and_bias(inputs, expected_outputs)
+        layer.update_weights_and_bias(inputs, expected_outputs, learning_rate)
         layer.reset_all()
 
-    def outputlayer_reverse(self, expected_outputs:list):
+    def outputlayer_reverse(self, expected_outputs:list, learning_rate:float):
         layer = self.layers[-1]
         derivatives = layer.previous_layer_derivatives(expected_outputs)
         last_layer = self.layers[-2]
         last_layer.set_derivatives_of_cost(derivatives)
         last_layer_activations = last_layer.get_previous_activations()
-        layer.update_weights_and_bias(last_layer_activations, expected_outputs)
+        layer.update_weights_and_bias(last_layer_activations, expected_outputs, learning_rate)
         layer.reset_all()
 
-    def hidden_layers_reverse(self):
+    def hidden_layers_reverse(self, learning_rate:float):
         for i in range(len(self.layers) - 2, 0, -1):
             layer = self.layers[i]
             expected = layer.get_expected()
@@ -44,14 +44,14 @@ class Network:
             last_layer = self.layers[i - 1]
             last_layer_activations = last_layer.get_previous_activations()
             last_layer.set_derivatives_of_cost(derivatives)
-            layer.update_weights_and_bias(last_layer_activations, expected)
+            layer.update_weights_and_bias(last_layer_activations, expected, learning_rate)
             layer.reset_all()
 
-    def first_layer_reverse(self, inputs:list):
+    def first_layer_reverse(self, inputs:list, learning_rate:float):
         layer = self.layers[0]
         last_layer_activations = inputs
         expected = layer.get_expected()
-        layer.update_weights_and_bias(last_layer_activations, expected)
+        layer.update_weights_and_bias(last_layer_activations, expected, learning_rate)
         layer.reset_all()
 
     def __repr__(self):
@@ -98,11 +98,11 @@ class Layer:
                 derivatives[i] += derivatives_by_neuron[j][i]
         return derivatives
 
-    def update_weights_and_bias(self, previous_layer_activations:list, expected:list):
+    def update_weights_and_bias(self, previous_layer_activations:list, expected:list, learning_rate:float):
         for neuron, value in zip(self.neurons, expected):
             weight_derivatives = neuron.weights_derivatives(previous_layer_activations, value)
             bias_derivative = neuron.bias_derivative(value)
-            neuron.update_weights_and_bias(weight_derivatives, bias_derivative)
+            neuron.update_weights_and_bias(weight_derivatives, bias_derivative, learning_rate)
 
     def reset_all(self):
         for neuron in self.neurons:
@@ -156,12 +156,12 @@ class Neuron:
     def update_derivative_of_cost(self, new:float):
         self.derivative_of_cost = new
 
-    def update_weights_and_bias(self, delta_weights:list, delta_bias:float):
+    def update_weights_and_bias(self, delta_weights:list, delta_bias:float, learning_rate:float):
         updated_weights = []
         for old, new in zip(self.weights, delta_weights):
-            updated_weights.append(old + new)
+            updated_weights.append(old + new * learning_rate)
         self.weights = updated_weights
-        self.bias += delta_bias
+        self.bias += delta_bias * learning_rate
 
     def reset_all(self):
         self.previous_activation = None
