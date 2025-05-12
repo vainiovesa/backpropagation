@@ -22,6 +22,13 @@ class Network:
             self.hidden_layers_reverse(learning_rate)
             self.first_layer_reverse(inputs, learning_rate)
 
+    def loss(self, expected_output:list):
+        error = 0
+        output = self.layers[-1].previous_activations
+        for output, expected in zip(output, expected_output):
+            error += (output - expected) ** 2
+        return error
+
     def one_layer_reverse(self, inputs:list, expected_outputs:list, learning_rate:float):
         layer = self.layers[0]
         layer.update_weights_and_bias(inputs, expected_outputs, learning_rate)
