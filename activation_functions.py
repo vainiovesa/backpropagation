@@ -6,6 +6,12 @@ def relu(x):
 def relu_derivative(x):
     return 1 if x > 0 else 0
 
+def lrelu(x):
+    return x if x > 0 else x / 1000
+
+def lrelu_derivative(x):
+    return 1 if x > 0 else 1 / 1000
+
 def sigmoid(x):
     return 1 / (1 + exp(-x))
 
