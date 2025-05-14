@@ -27,7 +27,8 @@ class Network:
         output = self.layers[-1].previous_activations
         for output, expected in zip(output, expected_output):
             error += (output - expected) ** 2
-        return error
+        n = len(expected_output)
+        return error / n
 
     def one_layer_reverse(self, inputs:list, expected_outputs:list, learning_rate:float):
         layer = self.layers[0]
