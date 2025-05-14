@@ -5,11 +5,12 @@ def gradient_descent(net:Network, data:list, learning_rate:float, iterations:int
     info = []
     errors = []
     i = 1
-    error_average = tolerance + 1
+
     min_error = float("inf")
     max_error = 0
+    tolerance_error = tolerance + 1
 
-    while i <= iterations and error_average > tolerance:
+    while i <= iterations and tolerance_error > tolerance:
         inputs, expected_outputs = choice(data)
         net.feedforward(inputs)
         error = net.loss(expected_outputs)
@@ -23,6 +24,7 @@ def gradient_descent(net:Network, data:list, learning_rate:float, iterations:int
             info.append((error_average, min_error, max_error))
             errors = []
 
+            tolerance_error = max_error
             min_error = float("inf")
             max_error = 0
 
