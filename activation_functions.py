@@ -17,3 +17,9 @@ def sigmoid(x):
 
 def sigmoid_derivative(x):
     return sigmoid(x) * (1 - sigmoid(x))
+
+def tanh(x):
+    return (exp(x) - exp(-x)) / (exp(x) + exp(-x))
+
+def tanh_derivative(x):
+    return 1 - tanh(x) ** 2
