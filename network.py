@@ -3,6 +3,7 @@ from random import random
 class Network:
     def __init__(self, size:list, activation_functions:list,
                  activation_function_derivatives:list):
+        self.size = size
         self.layers = []
         for i in range(1, len(size)):
             self.layers.append(Layer(size[i], size[i - 1], activation_functions[i - 1],
@@ -62,6 +63,14 @@ class Network:
         layer.update_weights_and_bias(last_layer_activations, expected, learning_rate)
         layer.reset_all()
 
+    def as_dict(self):
+        self_dict = {"size": self.size}
+        for i, layer in enumerate(self.layers):
+            self_dict[i] = []
+            for neuron in layer.neurons:
+                self_dict[i].append(neuron.weights + [neuron.bias] + [str(neuron.activation_function.__name__)])
+        return self_dict
+
     def __repr__(self):
         return f"Network {self.layers}"
 
@@ -72,8 +81,6 @@ class Layer:
         for _ in range(size):
             self.neurons.append(Neuron(previous_layer_size, activation_function,
                                        activation_function_derivative))
-        self.activation_function = activation_function
-        self.activation_function_erivative = activation_function_derivative
         self.previous_activations = None
 
     def activations(self, previous_layer_outputs:list):
