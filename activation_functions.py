@@ -1,5 +1,6 @@
 from math import exp
 
+
 def relu(x):
     return x if x > 0 else 0
 
@@ -23,3 +24,10 @@ def tanh(x):
 
 def tanh_derivative(x):
     return 1 - tanh(x) ** 2
+
+KNOWN = {
+    "relu":    [relu, relu_derivative],
+    "lrelu":   [lrelu, lrelu_derivative],
+    "sigmoid": [sigmoid, sigmoid_derivative],
+    "tanh":    [tanh, tanh_derivative]
+}

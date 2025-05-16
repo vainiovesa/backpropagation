@@ -1,4 +1,5 @@
 from random import random
+from activation_functions import KNOWN
 
 class Network:
     def __init__(self, size:list, activation_functions:list,
@@ -195,3 +196,34 @@ class Neuron:
         weights = [round(weight, 3) for weight in self.weights]
         bias = [round(self.bias, 3)]
         return f"Neuron {weights + bias}"
+
+class CustomNetwork(Network):
+    def __init__(self, network:dict):
+        self.size = network["size"]
+        self.layers = []
+        for i in range(len(self.size) - 1):
+            layer = network[str(i)]
+            neurons = []
+            for neuron in layer:
+                weights = neuron[:-2]
+                bias = neuron[-2]
+                functions = KNOWN[neuron[-1]]
+                activation = functions[0]
+                activation_derivative = functions[1]
+                neurons.append(CustomNeuron(weights, bias, activation, activation_derivative))
+            self.layers.append(CustomLayer(neurons))
+
+class CustomLayer(Layer):
+    def __init__(self, neurons:list):
+        self.neurons = neurons
+        self.previous_activations = None
+
+class CustomNeuron(Neuron):
+    def __init__(self, weights:list, bias:float, activation_function:callable, activation_function_derivative:callable):
+        self.activation_function = activation_function
+        self.activation_function_derivative = activation_function_derivative
+        self.weights = weights
+        self.bias = bias
+        self.derivative_of_cost = None
+        self.previous_weighted = None
+        self.previous_activation = None
