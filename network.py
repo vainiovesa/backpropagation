@@ -69,7 +69,8 @@ class Network:
         for i, layer in enumerate(self.layers):
             self_dict[i] = []
             for neuron in layer.neurons:
-                self_dict[i].append(neuron.weights + [neuron.bias] + [str(neuron.activation_function.__name__)])
+                self_dict[i].append(neuron.weights + [neuron.bias] +
+                                    [str(neuron.activation_function.__name__)])
         return self_dict
 
     def __repr__(self):
@@ -114,7 +115,8 @@ class Layer:
                 derivatives[i] += derivatives_by_neuron[j][i]
         return derivatives
 
-    def update_weights_and_bias(self, previous_layer_activations:list, expected:list, learning_rate:float):
+    def update_weights_and_bias(self, previous_layer_activations:list,
+                                expected:list, learning_rate:float):
         for neuron, value in zip(self.neurons, expected):
             weight_derivatives = neuron.weights_derivatives(previous_layer_activations, value)
             bias_derivative = neuron.bias_derivative(value)
@@ -219,7 +221,8 @@ class CustomLayer(Layer):
         self.previous_activations = None
 
 class CustomNeuron(Neuron):
-    def __init__(self, weights:list, bias:float, activation_function:callable, activation_function_derivative:callable):
+    def __init__(self, weights:list, bias:float, activation_function:callable,
+                 activation_function_derivative:callable):
         self.activation_function = activation_function
         self.activation_function_derivative = activation_function_derivative
         self.weights = weights
