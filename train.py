@@ -1,5 +1,6 @@
+import json
 from random import choice
-from network import Network
+from network import Network, CustomNetwork
 
 def gradient_descent(net:Network, data:list, learning_rate:float, iterations:int, tolerance:float, info_packet_size:int):
     info = []
@@ -32,3 +33,15 @@ def gradient_descent(net:Network, data:list, learning_rate:float, iterations:int
         i += 1
 
     return info
+
+def save_network(net:Network, json_filename:str):
+    dictionary = net.as_dict()
+    net_as_json = json.dumps(dictionary, indent=4)
+    with open(json_filename, "w") as outfile:
+        outfile.write(net_as_json)
+
+def upload_network(json_filename:str):
+    with open(json_filename, 'r') as file:
+        network_as_json = json.load(file)
+    net = CustomNetwork(network_as_json)
+    return net
