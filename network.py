@@ -2,13 +2,11 @@ from random import random
 from activation_functions import KNOWN
 
 class Network:
-    def __init__(self, size:list, activation_functions:list,
-                 activation_function_derivatives:list):
+    def __init__(self, size:list, activation_functions:list):
         self.size = size
         self.layers = []
         for i in range(1, len(size)):
-            self.layers.append(Layer(size[i], size[i - 1], activation_functions[i - 1],
-                                     activation_function_derivatives[i - 1]))
+            self.layers.append(Layer(size[i], size[i - 1], activation_functions[i - 1]))
 
     def feedforward(self, inputs:list):
         last = inputs
@@ -77,12 +75,10 @@ class Network:
         return f"Network {self.layers}"
 
 class Layer:
-    def __init__(self, size:int, previous_layer_size:int, activation_function:callable,
-                 activation_function_derivative:callable):
+    def __init__(self, size:int, previous_layer_size:int, activation_function:str):
         self.neurons = []
         for _ in range(size):
-            self.neurons.append(Neuron(previous_layer_size, activation_function,
-                                       activation_function_derivative))
+            self.neurons.append(Neuron(previous_layer_size, activation_function))
         self.previous_activations = None
 
     def activations(self, previous_layer_outputs:list):
@@ -130,10 +126,11 @@ class Layer:
         return f"Layer: {self.neurons}"
 
 class Neuron:
-    def __init__(self, previous_layer_neurons, activation_function:callable,
-                 activation_function_derivative:callable):
-        self.activation_function = activation_function
-        self.activation_function_derivative = activation_function_derivative
+    def __init__(self, previous_layer_neurons, activation_function:str):
+        if activation_function not in KNOWN:
+            raise ValueError("Not known activation function")
+        self.activation_function = KNOWN[activation_function][0]
+        self.activation_function_derivative = KNOWN[activation_function][1]
         self.weights = []
         for _ in range(previous_layer_neurons):
             self.weights.append(random() - 0.5)
