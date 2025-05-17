@@ -25,9 +25,16 @@ def tanh(x):
 def tanh_derivative(x):
     return 1 - tanh(x) ** 2
 
+def linear(x):
+    return x
+
+def linear_derivative(x):
+    return 1
+
 KNOWN = {
     "relu":    [relu, relu_derivative],
     "lrelu":   [lrelu, lrelu_derivative],
     "sigmoid": [sigmoid, sigmoid_derivative],
-    "tanh":    [tanh, tanh_derivative]
+    "tanh":    [tanh, tanh_derivative],
+    "linear":  [linear, linear_derivative]
 }
