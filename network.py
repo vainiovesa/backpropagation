@@ -1,4 +1,3 @@
-from random import random
 from activation_functions import KNOWN
 
 class Network:
@@ -7,6 +6,10 @@ class Network:
         self.layers = []
         for i in range(1, len(size)):
             self.layers.append(Layer(size[i], size[i - 1], activation_functions[i - 1]))
+
+    def initialize(self, initialization_method:callable):
+        for i, layer in enumerate(self.layers):
+            initialization_method(layer)
 
     def feedforward(self, inputs:list):
         last = inputs
@@ -133,8 +136,8 @@ class Neuron:
         self.activation_function_derivative = KNOWN[activation_function][1]
         self.weights = []
         for _ in range(previous_layer_neurons):
-            self.weights.append(random() - 0.5)
-        self.bias = random() - 0.5
+            self.weights.append(0)
+        self.bias = 0
         self.derivative_of_cost = None
         self.previous_weighted = None
         self.previous_activation = None
@@ -187,7 +190,6 @@ class Neuron:
         self.derivative_of_cost = derivative
 
     def set_weights_and_bias(self, weights:list, bias:float):
-        """Method for testing"""
         self.weights = weights
         self.bias = bias
 
