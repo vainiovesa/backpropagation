@@ -206,10 +206,8 @@ class CustomNetwork(Network):
             for neuron in layer:
                 weights = neuron[:-2]
                 bias = neuron[-2]
-                functions = KNOWN[neuron[-1]]
-                activation = functions[0]
-                activation_derivative = functions[1]
-                neurons.append(CustomNeuron(weights, bias, activation, activation_derivative))
+                activation_function = neuron[-1]
+                neurons.append(CustomNeuron(weights, bias, activation_function))
             self.layers.append(CustomLayer(neurons))
 
 class CustomLayer(Layer):
@@ -218,10 +216,9 @@ class CustomLayer(Layer):
         self.previous_activations = None
 
 class CustomNeuron(Neuron):
-    def __init__(self, weights:list, bias:float, activation_function:callable,
-                 activation_function_derivative:callable):
-        self.activation_function = activation_function
-        self.activation_function_derivative = activation_function_derivative
+    def __init__(self, weights:list, bias:float, activation_function:str):
+        self.activation_function = KNOWN[activation_function][0]
+        self.activation_function_derivative = KNOWN[activation_function][1]
         self.weights = weights
         self.bias = bias
         self.derivative_of_cost = None
