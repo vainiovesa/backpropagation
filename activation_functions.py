@@ -14,12 +14,18 @@ def lrelu_derivative(x):
     return 1 if x > 0 else 1 / 1000
 
 def sigmoid(x):
+    if x < -709:
+        return 0
     return 1 / (1 + exp(-x))
 
 def sigmoid_derivative(x):
     return sigmoid(x) * (1 - sigmoid(x))
 
 def tanh(x):
+    if x > 709:
+        return 1
+    if x < -709:
+        return -1
     return (exp(x) - exp(-x)) / (exp(x) + exp(-x))
 
 def tanh_derivative(x):
