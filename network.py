@@ -1,4 +1,6 @@
-from activation_functions import KNOWN
+from math import sqrt
+from random import random, uniform, normalvariate
+from activation_functions import KNOWN_AFD
 
 class Network:
     def __init__(self, size:list, activation_functions:list):
@@ -7,9 +9,10 @@ class Network:
         for i in range(1, len(size)):
             self.layers.append(Layer(size[i], size[i - 1], activation_functions[i - 1]))
 
-    def initialize(self, initialization_method:callable):
-        for i, layer in enumerate(self.layers):
-            initialization_method(layer)
+    def initialize(self, initialization_methods:list):
+        for layer, method in zip(self.layers, initialization_methods):
+            initialization = KNOWN_WI[method]
+            initialization(layer)
 
     def feedforward(self, inputs:list):
         last = inputs
@@ -130,10 +133,10 @@ class Layer:
 
 class Neuron:
     def __init__(self, previous_layer_neurons, activation_function:str):
-        if activation_function not in KNOWN:
+        if activation_function not in KNOWN_AFD:
             raise ValueError("Not known activation function")
-        self.activation_function = KNOWN[activation_function][0]
-        self.activation_function_derivative = KNOWN[activation_function][1]
+        self.activation_function = KNOWN_AFD[activation_function][0]
+        self.activation_function_derivative = KNOWN_AFD[activation_function][1]
         self.weights = []
         for _ in range(previous_layer_neurons):
             self.weights.append(0)
@@ -219,10 +222,41 @@ class CustomLayer(Layer):
 
 class CustomNeuron(Neuron):
     def __init__(self, weights:list, bias:float, activation_function:str):
-        self.activation_function = KNOWN[activation_function][0]
-        self.activation_function_derivative = KNOWN[activation_function][1]
+        self.activation_function = KNOWN_AFD[activation_function][0]
+        self.activation_function_derivative = KNOWN_AFD[activation_function][1]
         self.weights = weights
         self.bias = bias
         self.derivative_of_cost = None
         self.previous_weighted = None
         self.previous_activation = None
+
+# Weight initializations
+def basic(layer:Layer):
+    for neuron in layer.neurons:
+        new = [random() - 0.5 for _ in range(len(neuron.weights))]
+        neuron.set_weights_and_bias(new, 0)
+
+def glorot(layer:Layer):
+    """To be used with sigmoid and tanh"""
+    fan_in = len(layer.neurons[0].weights)
+    fan_out = len(layer.neurons)
+    boundary = sqrt(6) / sqrt(fan_in + fan_out)
+    for neuron in layer.neurons:
+        new = [uniform(-boundary, boundary) for _ in range(len(neuron.weights))]
+        neuron.set_weights_and_bias(new, 0)
+
+def kaiming(layer:Layer):
+    """To be used with ReLU"""
+    n = len(layer.neurons[0].weights)
+    deviation = sqrt(2 / n)
+    for neuron in layer.neurons:
+        new = [abs(normalvariate(sigma=deviation)) for _ in range(len(neuron.weights))]
+        neuron.set_weights_and_bias(new, 0)
+
+KNOWN_WI = {
+    "basic":    basic,
+    "glorot":   glorot,
+    "xavier":   glorot,
+    "kaiming":  kaiming,
+    "he":       kaiming
+}

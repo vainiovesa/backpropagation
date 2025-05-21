@@ -1,6 +1,5 @@
 from math import exp
 
-
 def relu(x):
     return x if x > 0 else 0
 
@@ -37,7 +36,7 @@ def linear(x):
 def linear_derivative(x):
     return 1
 
-KNOWN = {
+KNOWN_AFD = {
     "relu":    [relu, relu_derivative],
     "lrelu":   [lrelu, lrelu_derivative],
     "sigmoid": [sigmoid, sigmoid_derivative],
